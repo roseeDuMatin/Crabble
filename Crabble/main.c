@@ -7,6 +7,9 @@ void play();
 char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int doubleWords, int tripleWords, int negative);
 void freeDoubleArray(int rows, int cols, char **array);
 
+
+// Affichage
+void printGrid(int rows, int cols, char** grid);
 void printAllocError();
 
 int main(int argc, char ** argv){
@@ -14,6 +17,7 @@ int main(int argc, char ** argv){
     system("pause");
     return 0;
 }
+
 
 void menu(){
     int menuBool = 1;
@@ -49,8 +53,8 @@ void play(){
 
     // A SCANNER ET VERIFIER
     // =======================
-    rows = 3;
-    cols = 4;
+    rows = 6;
+    cols = 6;
     doubleLetters = 1;
     tripleLetters = 1;
     doubleWords = 1;
@@ -61,6 +65,10 @@ void play(){
     grid = initGrid(rows, cols, doubleLetters, tripleLetters, doubleWords, tripleWords, negative);
 
     system("cls");
+    
+    printGrid(rows, cols, grid);
+
+
     printf("JOUER !!! ");
     // printGrid();
     system("pause");
@@ -69,8 +77,7 @@ void play(){
 }
 
 char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int doubleWords, int tripleWords, int negative){
-    int i;
-    //int j;
+    int i, j;
     char ** grid = NULL;
 
     grid = malloc(sizeof(char*) * rows);
@@ -79,17 +86,18 @@ char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int do
     }
 
     for(i = 0; i < rows; i++){
-        grid = malloc(sizeof(char) * cols);
+        grid[i] = malloc(sizeof(char) * cols);
         if(!grid[i]){
             printAllocError();
         }
     }
 
-    // for(i = 0; i < rows; i++){
-    //     for(j = 0; j < cols; j++){
-    //         grid[i][j] = 0;
-    //     }
-    // }
+    for(i = 0; i < rows; i++){
+        for(j = 0; j < cols; j++){
+            // grid[i][j] = 32;
+            grid[i][j] = 97;
+        }
+    }
     return grid;
 }
 
@@ -104,8 +112,19 @@ void freeDoubleArray(int rows, int cols, char **array){
     free(array);
 }
 
+void printGrid(int rows, int cols, char** grid){
+    int i, j;
+
+    for(i = 0; i < rows; i++){
+        for(j = 0; j < cols; j++){
+            printf("%c ",grid[i][j]);
+        }
+        printf("\n");
+    }
+}
+
 void printAllocError(){
-    printf("\nErreur d'allocation");
+    printf("\nErreur d'allocation\n");
     system("pause");
     exit(0);
 }
