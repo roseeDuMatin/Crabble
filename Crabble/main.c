@@ -6,8 +6,8 @@ void menu();
 void start();
 
 // Déroulement partie
-void play(int rows, int cols, char** grid/*, char** bag, char* lettersJ1, char* lettersJ2*/);
-char** distribuate(/*char** bag, */ int isJ1, char** lettersJ2);
+void play(int rows, int cols, char** grid, char** bag/*, char* lettersJ1, char* lettersJ2*/);
+char** distribuate(char** bag, int isJ1, char** lettersJ2);
 
 // Initialisation
 char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int doubleWords, int tripleWords, int negative);
@@ -79,12 +79,12 @@ void start(){
     // =======================
 
     grid = initGrid(rows, cols, doubleLetters, tripleLetters, doubleWords, tripleWords, negative);
-    // bag = initBag();
+    bag = initBag();
     // lettersJ1 = initLetters(lettersJ1);
     // lettersJ2 = initLetters(lettersJ2);
-
+    system("pause");
     printGrid(rows, cols, grid);
-    play(rows, cols, grid);
+    play(rows, cols, grid, bag);
 
     system("pause");
     printf("\nJOUER !!! ");
@@ -92,7 +92,7 @@ void start(){
     system("pause");
 
     freeDoubleArray(rows, cols, grid);
-    // freeDoubleArray(2, 27, bag);
+    freeDoubleArray(2, 27, bag);
     // free(lettersJ1);
     // free(lettersJ2);
 }
@@ -176,7 +176,6 @@ int** initBag(){
     array[0] = initValue();
     array[1] = initPiece();
 
-    // printf("%d",array[1][26]);
     return array;
 }
 
@@ -287,7 +286,7 @@ void delay(){
 
 }
 
-void play(int rows, int cols, char** grid/*, char** bag, char* lettersJ1, char* lettersJ2*/){
+void play(int rows, int cols, char** grid, char** bag/*, char* lettersJ1, char* lettersJ2*/){
     int scoreJ1, scoreJ2, isJ1;
     int continueGame;
 
@@ -307,7 +306,7 @@ void play(int rows, int cols, char** grid/*, char** bag, char* lettersJ1, char* 
     // }
 }
 
-char** distribuate(/*char** bag, */ int isJ1, char** lettersJ2){
+char** distribuate(char** bag, int isJ1, char** lettersJ2){
 
 }
 
