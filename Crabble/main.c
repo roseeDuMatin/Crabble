@@ -32,8 +32,12 @@ void printLetters(char* letters);
 void freeDoubleArrayC(int rows, int cols, char **array);
 void freeDoubleArrayI(int rows, int cols, int **array);
 void delay();
-int returnValueOfLetter(char* letter, int** array);
+int checkOccurences(int** list, int index);
+int** addLetterToList(int* size, int** list, char letter, int* index);
+// int returnValueOfLetter(char* letter, int** array);
+int returnValueOfLetter(char letter, int** array);
 int calculateSizeLetters(char* letters);
+char* removeLetters(char *letters, char* word, int sizeWord);
 
 int main(int argc, char ** argv){
     menu();
@@ -91,7 +95,7 @@ void start(){
     negative = 1;
     // =======================
 
-    // chooseWord(); system("pause");
+    // chooseWord();
 
     grid = initGrid(rows, cols, doubleLetters, tripleLetters, doubleWords, tripleWords, negative);
     bag = initBag();
@@ -225,7 +229,9 @@ int** initList(){
                 list[i][j] = 0;
             }
         }
+        printf("%d %d", list[i], list[j]);
     }
+    printf("\n");
 
     return list;
 }
@@ -477,46 +483,67 @@ void endgame(int rows, int cols, char** grid, int **bag, char *lettersJ1, char *
     menu();
 }
 
-int returnValueOfLetter(char* letter, int** array){
+int returnValueOfLetter(char letter, int** array){
     int i;
-    for( i = 0; i < 26; i++){
-        if(letter == i+65){
+    for(i = 0; i < 26; i++){
+        if(letter == (char)(i + 65)){
             return array[0][i];
         }
     }
     return 0;
 }
 
-int isInList(int** list, char letter){
-    int i, j;
+int checkOccurences(int** list, int index){
+    return list[2][index] <= list[1][index];
+}
 
-    for(i = 0; i < 7; i++){
+int** addLetterToList(int* size, int** list, char letter, int* index){
+    // List : Tableau où on stocke [0][i] => le code ascii de la lettre, [1][i] => nb dans letters, [2][i] => nb dans word
+    int i, j;
+    int found = 0;
+
+    for(i = 0; i < *size; i++){
+        printf("%d ", list[0][i]);
         if(list[0][i] == -1 && list[0][i] == (int)letter){
             list[1][i]++;
             list[2][i]++;
+            *index = i;
+            found = 1;
         }
     }
-    return -1;
+
+    if(found == 0){
+        list[0][*size] = (int)letter;
+        *index = *size;
+        *size = *size + 1;
+    }
+
+    list;
 }
+
 char* chooseWord(/*char **letters*/){
-    int i, j;
-    int scanNotOK = 1;
+    int i, j, scanOK, sizeTemp, found;
     char temp[8];
-    int sizeTemp;
     char* word = NULL;
     int **list = NULL; // Tableau où on stocke [0][i] => le code ascii de la lettre, [1][i] => nb dans letters, [2][i] => nb dans word
+    int sizeList = 0;
+    int index;
     char letter;
 
     char letters[7] = {'A', 'B', 'C', '*', '*', '*', '*'};
     int size = calculateSizeLetters(letters);
-
 
     word = malloc(sizeof(char) * (size));
     if(!word){
         printAllocError();
     }
 
-    while(scanNotOK){
+    list = initList();
+
+    do{
+        scanOK = 1;
+        found = 0;
+
         printf("\n\nSaisissez votre mot:\n");
         fflush(stdin);
         scanf("%s", temp);
@@ -525,31 +552,63 @@ char* chooseWord(/*char **letters*/){
         while(temp[sizeTemp] != '\0'){
             sizeTemp++;
         }
-        if(sizeTemp <= size){
-            for(i = 0; i < size; i++){
-                word[i] = sizeTemp;
-                for(j = 0; j < size; j++){
-                    if(word[i] == letters[j]){
-                        if(isInList(list, word[i]) == -1){
-                            // ajouter
-                        }
+
+        if(sizeTemp > size){
+            scanOK = 0;
+        }
+
+        for(i = 0; i < size; i++){
+            word[i] = temp[i];
+            for(j = 0; j < size; j++){
+                // printf("w :%c ", word[i]);
+                if(word[i] == letters[j]){
+                    found = 1;
+                    // printf("list");
+                    list = addLetterToList(&sizeList, list, word[i], &index);
+                    if(!checkOccurences(list, index)){
+                        scanOK = 0;
                     }
-                    // prendre en compte doublons
-                    // if(){
-                    //     //
-                    // }
                 }
+            }
+            if(found == 0){
+                scanOK = 0;
+            }
+        }
+    printf("s: %d | f: %d", scanOK, found);
+    }while(!scanOK && !found);
+
+    freeDoubleArrayI(3, 7, list);
+    system("pause");
+    // free list
+    return word;
+}
+
+char* removeLetters(char *letters, char* word, int sizeWord){
+    int i,j;
+    int sizeLetters= calculateSizeLetters(letters);
+
+    for(i = 0; i< sizeLetters; i++){
+        for(j = 0; j < sizeWord; j++){
+            if(word[i] == letters[j]){
+                printf("%c\n", letters[j]);
+                letters[j] = '*';
             }
         }
     }
 
-
-
-    // for(i = 0; i < size; i++){
-
-    // }
-
-    return word;
+    int temp = 0;
+    for (i = 0; i < sizeLetters - 1; i++)
+    {
+        for (j = i + 1; j < sizeLetters; j++)
+        {
+            if (letters[i] == '*'){
+                temp = letters[i];
+                letters[i] = letters[j];
+                letters[j] = temp;
+            }        
+        }
+     }
+    return letters;
 }
 
 int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** grid, int* word){
@@ -573,8 +632,20 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
     int max2 = 0;
     int max3 = 0;
 
-    int resu[3][4];
+    int** resu = NULL;
     int i, j;
+
+    resu = malloc(sizeof(int*)*3);
+    if(!resu){
+        printAllocError();
+    }
+
+    for(i = 0; i < 3; i++){
+        resu[i] = malloc(sizeof(int)*4);
+        if(!resu[i]){
+            printAllocError();
+        }
+    }
 
     // On cherche quand peut démarrer le tableau au minimum
     while(size<pos_r){

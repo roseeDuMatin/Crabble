@@ -9,6 +9,9 @@ char** fillGridWith(int rows, int cols, char**grid, char letter, int caseNumber)
 
 void delay();
 
+char* removeLetters(char *letters, char* word, int sizeWord);
+int calculateSizeLetters(char* letters);
+
 void printAllocError();
 
 
@@ -31,9 +34,15 @@ int main(int argc, char* argv[])
         printf("\n");
     }
 
-    int test[5] = {1,2,1,2,1};
+    char letters[7]={'a','b','c','d','e','f','g'};
+    char word[3]={'a','b','c'};
+    char *letters2;
 
-    resu = best3Moves(9,9,2,6,5,grid,test);
+    letters2 = removeLetters(letters,word,3);
+
+    for(int i = 0; i <7; i++){
+        printf("%c",letters2[i]);
+    }
 
 	
 
@@ -43,13 +52,9 @@ int main(int argc, char* argv[])
 
 
 
-char* removeLetters(char *letters, char* word){
-
-
-}
-
-
 int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** grid, int* word){
+
+    
     int size = wordSize-1;
 
     int cmpt_start1=0;
@@ -70,15 +75,15 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
     int max2 = 0;
     int max3 = 0;
 
-    int resu[3][4];
 
-    int resu** = malloc(sizeof(int*)*3);
+    int **resu = malloc(sizeof(int*)*3);
 
     for(int i = 0; i < 3; i++){
         resu[i] = malloc(sizeof(int)*4);
     }
 
-    // On cherche quand peut démarrer le tableau au minimum
+    // On cherche quand peut dÃ©marrer le tableau au minimum
+
     while(size<pos_r){
         cmpt_start1 +=1;
         size+=1;
@@ -94,6 +99,8 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
     printf("%d\n",cmpt_start2);
 
     //Parcours ligne du point pour max1
+
+
 
     for(int j = 0; j < wordSize-1; j++){
         if(pos_r+j <= rGrid-1 && cmpt_start1+j <= pos_r){
@@ -139,6 +146,7 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
             while(MD>0){
                 rows_res *= (2);
                 MD--;
+
             }
 
             while(MT>0){
@@ -168,6 +176,7 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
             rows_res = 0;
             cmpt_word=0;
         }
+            
     }
 
     //Parcours colonne du point pour max 1
@@ -209,13 +218,17 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
                 }
                 else{
                     col_res += word[cmpt_word] ;
-                }
-                cmpt_word+=1;
+                
+             
             }
+
+            cmpt_word+=1;
+        }
 
             while(MD>0){
                 col_res *= (2);
                 MD--;
+
             }
 
             while(MT>0){
@@ -232,7 +245,6 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
                 col_res *= (-3);
                 MT_N--;
             }
-
             if(col_res> max1){
                 max1 = col_res;
                 resu[0][0] = pos_r;
@@ -240,14 +252,21 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
                 resu[0][2] = 1;
                 resu[0][3] = max1;
             }
-
             printf("%d\n",col_res);
             col_res = 0;
             cmpt_word=0;
+
+            
         }
+            
     }
 
+
+
     //Parcours ligne du point pour max2
+
+
+
     for(int j = 0; j < wordSize-1; j++){
         if(pos_r+j <= rGrid-1 && cmpt_start1+j <= pos_r){
             for(int i = cmpt_start1+j; i<=cmpt_start1+(wordSize-1)+j;i++){
@@ -292,6 +311,7 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
             while(MD>0){
                 rows_res *= (2);
                 MD--;
+
             }
 
             while(MT>0){
@@ -359,15 +379,21 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
                 }
                 else if (grid[pos_r][i] == 45){
                     col_res += word[cmpt_word]* (-1);
+
                 }
                 else{
                     col_res += word[cmpt_word] ;
+                
+             
             }
+
             cmpt_word+=1;
         }
+
             while(MD>0){
                 col_res *= (2);
                 MD--;
+
             }
 
             while(MT>0){
@@ -395,17 +421,24 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
             printf("%d\n",col_res);
             col_res = 0;
             cmpt_word=0;
+
+            
         }
 
-        if(max2 == 0){
-            resu[1][0] = -1;
-            resu[1][1] = -1;
-            resu[1][2] = -1;
-            resu[1][3] = -1;
-        }
+
+            if(max2 == 0){
+                resu[1][0] = -1;
+                resu[1][1] = -1;
+                resu[1][2] = -1;
+                resu[1][3] = -1;
+            }
+            
     }
 
+
     //Parcours ligne du point pour max3
+
+
 
     for(int j = 0; j < wordSize-1; j++){
         if(pos_r+j <= rGrid-1 && cmpt_start1+j <= pos_r){
@@ -523,13 +556,17 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
                 }
                 else{
                     col_res += word[cmpt_word] ;
+                
+             
             }
 
             cmpt_word+=1;
         }
+
             while(MD>0){
                 col_res *= (2);
                 MD--;
+
             }
 
             while(MT>0){
@@ -557,16 +594,24 @@ int** best3Moves(int rGrid, int cGrid, int pos_r, int pos_c,int wordSize,char** 
             printf("%d\n",col_res);
             col_res = 0;
             cmpt_word=0;
+
+            
         }
 
-        if(max3 == 0){
-            resu[2][0] = -1;
-            resu[2][1] = -1;
-            resu[2][2] = -1;
-            resu[2][3] = -1;
-        }
+        
+            if(max3 == 0){
+                resu[2][0] = -1;
+                resu[2][1] = -1;
+                resu[2][2] = -1;
+                resu[2][3] = -1;
+            }
+            
     }
+
+
     return resu;
+
+
 }
 
 
@@ -592,7 +637,7 @@ char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int do
         }
     }
 
-    // Remplir la grille avec les cases spéciales
+    // Remplir la grille avec les cases spÃ©ciales
     grid = fillGridWith(rows, cols, grid, 49, doubleLetters);
     grid = fillGridWith(rows, cols, grid, 50, tripleLetters);
     grid = fillGridWith(rows, cols, grid, 51, doubleWords);
@@ -606,14 +651,14 @@ char** fillGridWith(int rows, int cols, char**grid, char letter, int caseNumber)
     int x, y, hasChanged;
     time_t timeForRandom;
 
-    // Initialise le générateur aléatoire sur le temps
+    // Initialise le gÃ©nÃ©rateur alÃ©atoire sur le temps
     srand((unsigned) time(&timeForRandom));
 
     while(caseNumber > 0){
         do{
             hasChanged = 0;
             if(letter == 45){
-                // Modifier le générateur aléatoire pour ne pas avoir toujours les mêmes case négatives
+                // Modifier le gÃ©nÃ©rateur alÃ©atoire pour ne pas avoir toujours les mÃªmes case nÃ©gatives
                 delay();
                 srand((unsigned) time(&timeForRandom));
             }
@@ -647,4 +692,55 @@ void printAllocError(){
     printf("\nErreur d'allocation");
     system("pause");
     exit(0);
+}
+
+
+char* removeLetters(char *letters, char* word, int sizeWord){
+    int sizeLetters= calculateSizeLetters(letters);
+
+    int i,j;
+
+    for(i=0; i< sizeLetters; i++){
+        for(j=0; j < sizeWord; j++){
+            if(word[i]==letters[j]){
+                printf("%c\n", letters[j]);
+                letters[j]='*';
+            }
+        }
+    }
+
+    int temp = 0;
+     for (i = 0; i < sizeLetters - 1; i++)
+     {
+         for (j = i + 1; j < sizeLetters; j++)
+         {
+              if (letters[i] == '*'){
+                  temp= letters[i];
+                  letters[i] = letters[j];
+                  letters[j] = temp;
+              }
+                
+         }
+            
+     }
+            
+
+    
+        
+
+       
+    
+
+    return letters;
+
+}
+
+int calculateSizeLetters(char* letters){
+    int size = 0;
+
+    // char 42 <=> '*' dans les cases vides
+    while(size < 7 && letters[size] != 42){
+        size++;
+    }
+    return size;
 }
