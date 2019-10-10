@@ -5,23 +5,32 @@
 void menu();
 void start();
 
+// Déroulement partie
+void play(int rows, int cols, char** grid/*, char** bag, char* lettersJ1, char* lettersJ2*/);
+char** distribuate(/*char** bag, */ int isJ1, char** lettersJ2);
+
+// Initialisation
 char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int doubleWords, int tripleWords, int negative);
 char** fillGridWith(int rows, int cols, char**grid, char letter, int caseNumber);
-
-void freeDoubleArray(int rows, int cols, char **array);
-void delay();
+//char*  initLetters(*char letters);
+int** initBag();
+int* initValue();
+int* initPiece();
 
 // Affichage
 void printGrid(int rows, int cols, char** grid);
 void printGridLine(int cols);
 void printAllocError();
 
+// Divers
+void freeDoubleArray(int rows, int cols, char **array);
+void delay();
+
 int main(int argc, char ** argv){
     menu();
     system("pause");
     return 0;
 }
-
 
 void menu(){
     int menuBool = 1;
@@ -52,9 +61,12 @@ void menu(){
 }
 
 void start(){
-    char **grid = NULL;
     int rows, cols, doubleLetters, tripleLetters, doubleWords, tripleWords, negative;
 
+    char **grid = NULL;
+    char **bag = NULL;
+    char *lettersJ1 = NULL;
+    char *lettersJ2 = NULL;
     // A SCANNER ET VERIFIER
     // =======================
     rows = 6;
@@ -67,14 +79,22 @@ void start(){
     // =======================
 
     grid = initGrid(rows, cols, doubleLetters, tripleLetters, doubleWords, tripleWords, negative);
+    // bag = initBag();
+    // lettersJ1 = initLetters(lettersJ1);
+    // lettersJ2 = initLetters(lettersJ2);
 
-    system("cls");
     printGrid(rows, cols, grid);
+    play(rows, cols, grid);
+
+    system("pause");
     printf("\nJOUER !!! ");
-    
+
     system("pause");
 
     freeDoubleArray(rows, cols, grid);
+    // freeDoubleArray(2, 27, bag);
+    // free(lettersJ1);
+    // free(lettersJ2);
 }
 
 char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int doubleWords, int tripleWords, int negative){
@@ -109,8 +129,59 @@ char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int do
     return grid;
 }
 
+int* initValue(){
+    int i;
+    int tabTemp[27] = {1 , 3 , 3 , 2 , 1 , 4 , 2 , 4 , 1 , 8 , 10 , 1 , 2 , 1 , 1 , 3 , 8 , 1 , 1 , 1 , 1 , 4 , 10 , 10 , 10 , 10, 0};
+    int *value = NULL;
+    value = malloc(sizeof(int) * 27);
+    if(!value){
+        printAllocError();
+    }
+
+    for(i = 0; i < 27; i++){
+        value[i] = tabTemp[i];
+    }
+    return value;
+}
+
+int* initPiece(){
+    int i;
+    int tabTemp[27] = {9 , 2 , 2 , 3 , 15 , 2 , 2 , 2 , 8 , 1 , 1 , 5 , 3 , 6 , 6 , 2 , 1 , 6 , 6 , 6 , 6 , 2 , 1 , 1 , 1 , 1 , 2};
+    int *piece = NULL;
+    piece = malloc(sizeof(int) * 27);
+    if(!piece){
+        printAllocError();
+    }
+    for(i = 0; i < 27; i++){
+        piece[i] = tabTemp[i];
+    }
+    return piece;
+}
+
+int** initBag(){
+    int i;
+    int** array = NULL;
+
+    array = malloc(sizeof(int*) * 2);
+    if(!array){
+        printAllocError();
+    }
+    for(i =0; i < 27; i++){
+        array[i] = malloc(sizeof(int) * 27);
+        if(!array[i]){
+            printAllocError();
+        }
+    }
+
+    array[0] = initValue();
+    array[1] = initPiece();
+
+    // printf("%d",array[1][26]);
+    return array;
+}
+
 char** fillGridWith(int rows, int cols, char**grid, char letter, int caseNumber){
-    int i, j, x, y, hasChanged;
+    int x, y, hasChanged;
     time_t timeForRandom;
 
     // Initialise le générateur aléatoire sur le temps
@@ -155,7 +226,8 @@ void freeDoubleArray(int rows, int cols, char **array){
 void printGrid(int rows, int cols, char** grid){
     int i, j;
     char letter;
-    
+
+    system("cls");
     printf( "=========================================================\n"
             "                       CRABBLE\n"
             "=========================================================\n\n");
@@ -208,9 +280,39 @@ void printAllocError(){
 
 void delay(){
     int i, j;
-   
+
     for (i = 0; i < 12345; i++){
-        for (j = 0; j < 12345; j++){} 
+        for (j = 0; j < 12345; j++){}
     }
-       
+
+}
+
+void play(int rows, int cols, char** grid/*, char** bag, char* lettersJ1, char* lettersJ2*/){
+    int scoreJ1, scoreJ2, isJ1;
+    int continueGame;
+
+    continueGame = 1;
+    isJ1 = 1;
+    scoreJ1 = 0;
+    scoreJ2 = 0;
+    // while(continueGame){
+    //     if(isJ1){
+    //         // lettersJ1 = distribuate(/*bag*/, &isJ1, &lettersJ1);
+    //     }else{
+    //         // lettersJ2 = distribuate(/*bag*/, &isJ1, &lettersJ2);
+    //     }
+    //     // printHand()
+    //     // askToPlay(rows, cols, grid, &isJ1, isJ1 ? &scoreJ1 : &scoreJ2, isJ1 ? &lettersJ1 : &lettersJ2);
+    //     // continueGame = checkEndGame();
+    // }
+}
+
+char** distribuate(/*char** bag, */ int isJ1, char** lettersJ2){
+
+}
+
+void askToPlay(int rows, int cols, char** grid, int isJ1, int* score, char* letters){
+    // pass()
+    // write()
+    // endGame()
 }
