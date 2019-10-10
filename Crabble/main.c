@@ -21,10 +21,13 @@ int* initPiece();
 void printGrid(int rows, int cols, char** grid);
 void printGridLine(int cols);
 void printAllocError();
+// void printLetters(char* letters);
 
 // Divers
 void freeDoubleArray(int rows, int cols, char **array);
 void delay();
+int returnValueOfLetter(char* letter, int** array);
+
 
 int main(int argc, char ** argv){
     menu();
@@ -36,10 +39,10 @@ void menu(){
     int menuBool = 1;
 
     do{
-        printf( "=========================================================\n"
+        printf( " =========================================================\n"
                 "                   BIENVENUE AU CRABBLE\n"
-                "=========================================================\n\n"
-                "Taper :\n"
+                " =========================================================\n\n"
+                " Taper :\n"
                 "   1) Pour jouer\n"
                 "   2) Pour quitter\n"
                 );
@@ -82,8 +85,7 @@ void start(){
     bag = initBag();
     lettersJ1 = initLetters(lettersJ1);
     lettersJ2 = initLetters(lettersJ2);
-    printGrid(rows, cols, grid);
-    
+
     play(rows, cols, grid, bag, lettersJ1, lettersJ1);
 
     system("pause");
@@ -235,9 +237,9 @@ void printGrid(int rows, int cols, char** grid){
     char letter;
 
     system("cls");
-    printf( "=========================================================\n"
+    printf( " =========================================================\n"
             "                       CRABBLE\n"
-            "=========================================================\n\n");
+            " =========================================================\n\n");
 
     for(i = 0; i < rows; i++){
         printGridLine(rows);
@@ -302,24 +304,70 @@ void play(int rows, int cols, char** grid, char** bag, char* lettersJ1, char* le
     isJ1 = 1;
     scoreJ1 = 0;
     scoreJ2 = 0;
-    // while(continueGame){
-    //     if(isJ1){
-    //         // lettersJ1 = distribuate(/*bag*/, &isJ1, &lettersJ1);
-    //     }else{
-    //         // lettersJ2 = distribuate(/*bag*/, &isJ1, &lettersJ2);
-    //     }
-    //     // printHand()
-    //     // askToPlay(rows, cols, grid, &isJ1, isJ1 ? &scoreJ1 : &scoreJ2, isJ1 ? &lettersJ1 : &lettersJ2);
-    //     // continueGame = checkEndGame();
-    // }
+    while(continueGame){
+        if(isJ1){
+            // lettersJ1 = distribuate(/*bag*/, &isJ1, &lettersJ1);
+        }else{
+            // lettersJ2 = distribuate(/*bag*/, &isJ1, &lettersJ2);
+        }
+        // printHand()
+        askToPlay(rows, cols, grid, bag, isJ1 ? &scoreJ1 : &scoreJ2, isJ1 ? &lettersJ1 : &lettersJ2);
+        // continueGame = checkEndGame();
+        isJ1 = isJ1 ? 0 : 1;
+        // printf("J :%d\n", isJ1);
+    }
 }
 
-char** distribuate(char** bag, int isJ1, char** lettersJ2){
+// char** distribuate(char** bag, int isJ1, char** lettersJ2){
+
+// }
+
+void askToPlay(int rows, int cols, char** grid, char** bag, int* score, char* letters){
+    int menuBool = 1;
+
+    do{
+        printGrid(rows, cols, grid);
+        // printLetters(char* letters);
+        printf( "    Taper :\n"  
+                "       1) Pour passer votre tour\n"
+                // "       2) Pour poser un mot\n"
+                "       3) Pour quitter\n"
+                );
+
+        fflush(stdin);
+        scanf("%d", &menuBool);
+
+        while(menuBool != 1 /*&& menuBool != 2*/ && menuBool != 3){
+            system("cls");
+            printGrid(rows, cols, grid);
+            // printLetters(letters);
+            printf("Taper 1 ou 3");
+            // printf("Taper 1, 2 ou 3");
+            fflush(stdin);
+            scanf("%d", &menuBool);
+        }
+
+
+        if(menuBool == 2){
+            // meilleurCoup();
+            return 1;
+        }
+        // }else if(menuBool == 3){
+        //     endGame();
+        //     return 0;
+        // }
+    }while(menuBool != 1);
+}
+
+void engame(){
 
 }
 
-void askToPlay(int rows, int cols, char** grid, int isJ1, int* score, char* letters){
-    // pass()
-    // write()
-    // endGame()
+int returnValueOfLetter(char* letter, int** array){
+    for(int i = 0; i < 26; i++){
+        if(letter == i+65){
+            return array[0][i];
+        }
+    }
+    return 0;
 }
