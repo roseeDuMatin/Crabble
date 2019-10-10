@@ -9,6 +9,7 @@ void start();
 void play(int rows, int cols, char** grid, int** bag, char* lettersJ1, char* lettersJ2);
 char** distribuate(int** bag, int isJ1, char** lettersJ2);
 int askToPlay(int rows, int cols, char** grid, int** bag, int* score, char* letters);
+char* chooseWord(/*char* letters*/);
 void endgame(int rows, int cols, char** grid, int ** bag, char *lettersJ1, char *lettersJ2, int scoreJ1, int scoreJ2);
 
 // Initialisation
@@ -16,6 +17,7 @@ char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int do
 char** fillGridWith(int rows, int cols, char**grid, char letter, int caseNumber);
 char* initLetters(char* letters);
 int** initBag();
+int** initList();
 int* initValue();
 int* initPiece();
 
@@ -23,14 +25,14 @@ int* initPiece();
 void printGrid(int rows, int cols, char** grid);
 void printGridLine(int cols);
 void printAllocError();
-// void printLetters(char* letters);
+void printLetters(char* letters);
 
 // Divers
 void freeDoubleArrayC(int rows, int cols, char **array);
 void freeDoubleArrayI(int rows, int cols, int **array);
 void delay();
 int returnValueOfLetter(char* letter, int** array);
-
+int calculateSizeLetters(char* letters);
 
 int main(int argc, char ** argv){
     menu();
@@ -88,6 +90,8 @@ void start(){
     negative = 1;
     // =======================
 
+    // chooseWord(); system("pause");
+
     grid = initGrid(rows, cols, doubleLetters, tripleLetters, doubleWords, tripleWords, negative);
     bag = initBag();
     lettersJ1 = initLetters(lettersJ1);
@@ -103,7 +107,7 @@ void start(){
     if(lettersJ2){
         free(lettersJ2);
     }
-    
+
 }
 
 char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int doubleWords, int tripleWords, int negative){
@@ -194,6 +198,35 @@ char* initLetters(char* letters){
         printAllocError();
     }
     return letters;
+}
+
+int** initList(){
+    int i, j;
+    int **list = NULL;
+    
+    list = malloc(sizeof(int*) * 3);
+    if(!list){
+        printAllocError();
+    }
+
+    for(i = 0; i < 3; i++){
+        list[i] = malloc(sizeof(int) * 7);
+        if(!list[i]){
+            printAllocError();
+        }
+    }
+
+    for(i = 0; i < 3; i++){
+        for(j = 0; j < 7; j++){
+            if(i == 0){
+                list[i][j] = -1;
+            }else{
+                list[i][j] = 0;
+            }
+        }
+    }
+
+    return list;
 }
 
 char** fillGridWith(int rows, int cols, char**grid, char letter, int caseNumber){
@@ -307,10 +340,31 @@ void printGridLine(int cols){
         printf("-\n");
 }
 
+void printLetters(char* letters){
+    int i;
+    int size = calculateSizeLetters(letters);
+
+    printf("\n        ");
+    for(i = 0; i < size; i++){
+        printf("| %c | ", letters[i]);
+    }
+    printf("\n\n");
+}
+
 void printAllocError(){
     printf("\nErreur d'allocation\n");
     system("pause");
     exit(0);
+}
+
+int calculateSizeLetters(char* letters){
+    int size = 0;
+
+    // char 42 <=> '*' dans les cases vides
+    while(size < 7 && letters[size] != 42){
+        size++;
+    }
+    return size;
 }
 
 void delay(){
@@ -332,11 +386,10 @@ void play(int rows, int cols, char** grid, int** bag, char* lettersJ1, char* let
     scoreJ2 = 0;
     while(continueGame){
         if(isJ1){
-            // lettersJ1 = distribuate(bag, lettersJ1, int size);
+            // lettersJ1 = distribuate(bag, lettersJ1, calculateSizeLetters(lettersJ1));
         }else{
-            // lettersJ2 = distribuate(bag, letters, int size);
+            // lettersJ2 = distribuate(bag, lettersJ2, calculateSizeLetters(lettersJ2));
         }
-        // printHand()
         continueGame = askToPlay(rows, cols, grid, bag, isJ1 ? &scoreJ1 : &scoreJ2, isJ1 ? lettersJ1 : lettersJ2);
         if(continueGame == 1){
             // checkEndGame();
@@ -352,33 +405,35 @@ void play(int rows, int cols, char** grid, int** bag, char* lettersJ1, char* let
 
 // }
 
+
 int askToPlay(int rows, int cols, char** grid, int** bag, int* score, char* letters){
     int menuBool = 1;
+    char* word = NULL;
 
     do{
         printGrid(rows, cols, grid);
-        // printLetters(char* letters);
+        printLetters(letters);
         printf( "    Taper :\n"
                 "       1) Pour passer votre tour\n"
-                // "       2) Pour poser un mot\n"
+                "       2) Pour poser un mot\n"
                 "       3) Pour quitter la partie\n"
                 );
 
         fflush(stdin);
         scanf("%d", &menuBool);
 
-        while(menuBool != 1 /*&& menuBool != 2*/ && menuBool != 3){
+        while(menuBool != 1 && menuBool != 2 && menuBool != 3){
             system("cls");
             printGrid(rows, cols, grid);
-            // printLetters(letters);
-            printf("Taper 1 ou 3");
-            // printf("Taper 1, 2 ou 3");
+            printLetters(letters);
+            // printf("Taper 1 ou 3");
+            printf("Taper 1, 2 ou 3");
             fflush(stdin);
             scanf("%d", &menuBool);
         }
 
-
         if(menuBool == 2){
+            // word = chooseWord(letters);
             // meilleurCoup();
             // incrémentation score ???
         }else if(menuBool == 3){
@@ -429,4 +484,71 @@ int returnValueOfLetter(char* letter, int** array){
         }
     }
     return 0;
+}
+
+int isInList(int** list, char letter){
+    int i, j;
+
+    for(i = 0; i < 7; i++){
+        if(list[0][i] == -1 && list[0][i] == (int)letter){
+            list[1][i]++;
+            list[2][i]++;
+        }
+    }
+    return -1;
+}
+char* chooseWord(/*char **letters*/){
+    int i, j;
+    int scanNotOK = 1;
+    char temp[8];
+    int sizeTemp;
+    char* word = NULL;
+    int **list = NULL; // Tableau où on stocke [0][i] => le code ascii de la lettre, [1][i] => nb dans letters, [2][i] => nb dans word
+    char letter;
+
+    char letters[7] = {'A', 'B', 'C', '*', '*', '*', '*'};
+    int size = calculateSizeLetters(letters);
+
+
+    word = malloc(sizeof(char) * (size));
+    if(!word){
+        printAllocError();
+    }
+
+    while(scanNotOK){
+        printf("\n\nSaisissez votre mot:\n");
+        fflush(stdin);
+        scanf("%s", temp);
+        
+        sizeTemp = 0;
+        while(temp[sizeTemp] != '\0'){
+            sizeTemp++;
+        }
+        if(sizeTemp <= size){
+            for(i = 0; i < size; i++){
+                word[i] = sizeTemp;
+                for(j = 0; j < size; j++){
+                    if(word[i] == letters[j]){
+                        if(isInList(list, word[i]) == -1){
+                            // ajouter
+                        }
+                    }
+                    // prendre en compte doublons
+                    // if(){
+                    //     // 
+                    // }
+                }
+            }
+        }
+    }
+
+
+
+    // for(i = 0; i < size; i++){
+
+    // }
+
+
+
+    return word;
 }
