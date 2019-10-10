@@ -234,10 +234,12 @@ void freeDoubleArrayC(int rows, int cols, char **array){
     for(i = 0; i < rows; i++){
         if(array[i]){
             free(array[i]);
+            array[i] = NULL;
         }
     }
     if(array){
         free(array);
+        array = NULL;
     }
 }
 
@@ -247,11 +249,13 @@ void freeDoubleArrayI(int rows, int cols, int **array){
     for(i = 0; i < rows; i++){
         if(array[i]){
             free(array[i]);
+            array[i] = NULL;
         }
     }
-    if(array){
-        free(array);
-    }
+    // if(array){
+    //     free(array);
+    //     array = NULL;
+    // }
 }
 
 void printGrid(int rows, int cols, char** grid){
@@ -357,7 +361,7 @@ int askToPlay(int rows, int cols, char** grid, int** bag, int* score, char* lett
         printf( "    Taper :\n"
                 "       1) Pour passer votre tour\n"
                 // "       2) Pour poser un mot\n"
-                "       3) Pour quitter\n"
+                "       3) Pour quitter la partie\n"
                 );
 
         fflush(stdin);
@@ -404,19 +408,17 @@ void endgame(int rows, int cols, char** grid, int **bag, char *lettersJ1, char *
     system("pause");
 
     freeDoubleArrayC(rows, cols, grid);
-    printf("okc");
-
     freeDoubleArrayI(2, 27, bag);
-    printf("oki");
-    system("pause");
+
     if(lettersJ1){
         free(lettersJ1);
+        lettersJ1 = NULL;
     }
     if(lettersJ2){
         free(lettersJ2);
+        lettersJ2 = NULL;
     }
-    // menu();
-    exit(0);
+    menu();
 }
 
 int returnValueOfLetter(char* letter, int** array){
