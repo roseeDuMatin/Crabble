@@ -6,8 +6,10 @@ void menu();
 void start();
 
 // Déroulement partie
-void play(int rows, int cols, char** grid, char** bag, char* lettersJ1, char* lettersJ2);
-char** distribuate(char** bag, int isJ1, char** lettersJ2);
+void play(int rows, int cols, char** grid, int** bag, char* lettersJ1, char* lettersJ2);
+char** distribuate(int** bag, int isJ1, char** lettersJ2);
+int askToPlay(int rows, int cols, char** grid, int** bag, int* score, char* letters);
+void endgame(int rows, int cols, char** grid, int ** bag, char *lettersJ1, char *lettersJ2, int scoreJ1, int scoreJ2);
 
 // Initialisation
 char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int doubleWords, int tripleWords, int negative);
@@ -24,7 +26,8 @@ void printAllocError();
 // void printLetters(char* letters);
 
 // Divers
-void freeDoubleArray(int rows, int cols, char **array);
+void freeDoubleArrayC(int rows, int cols, char **array);
+void freeDoubleArrayI(int rows, int cols, int **array);
 void delay();
 int returnValueOfLetter(char* letter, int** array);
 
@@ -39,6 +42,7 @@ void menu(){
     int menuBool = 1;
 
     do{
+        system("cls");
         printf( " =========================================================\n"
                 "                   BIENVENUE AU CRABBLE\n"
                 " =========================================================\n\n"
@@ -59,6 +63,9 @@ void menu(){
 
         if(menuBool == 1){
             start();
+        }else{
+            system("pause");
+            exit(0);
         }
     }while(menuBool != 2);
 }
@@ -67,7 +74,7 @@ void start(){
     int rows, cols, doubleLetters, tripleLetters, doubleWords, tripleWords, negative;
 
     char **grid = NULL;
-    char **bag = NULL;
+    int **bag = NULL;
     char *lettersJ1 = NULL;
     char *lettersJ2 = NULL;
     // A SCANNER ET VERIFIER
@@ -88,15 +95,15 @@ void start(){
 
     play(rows, cols, grid, bag, lettersJ1, lettersJ1);
 
-    system("pause");
-    printf("\nJOUER !!! ");
-
-    system("pause");
-
-    freeDoubleArray(rows, cols, grid);
-    freeDoubleArray(2, 27, bag);
-    free(lettersJ1);
-    free(lettersJ2);
+    freeDoubleArrayC(rows, cols, grid);
+    freeDoubleArrayI(2, 27, bag);
+    if(lettersJ1){
+        free(lettersJ1);
+    }
+    if(lettersJ2){
+        free(lettersJ2);
+    }
+    
 }
 
 char** initGrid(int rows, int cols, int doubleLetters, int tripleLetters, int doubleWords, int tripleWords, int negative){
@@ -221,15 +228,30 @@ char** fillGridWith(int rows, int cols, char**grid, char letter, int caseNumber)
     return grid;
 }
 
-void freeDoubleArray(int rows, int cols, char **array){
-    int i, j;
+void freeDoubleArrayC(int rows, int cols, char **array){
+    int i;
 
     for(i = 0; i < rows; i++){
-        for(j = 0; j < cols; j++){
-            free(*array);
+        if(array[i]){
+            free(array[i]);
         }
     }
-    free(array);
+    if(array){
+        free(array);
+    }
+}
+
+void freeDoubleArrayI(int rows, int cols, int **array){
+    int i;
+
+    for(i = 0; i < rows; i++){
+        if(array[i]){
+            free(array[i]);
+        }
+    }
+    if(array){
+        free(array);
+    }
 }
 
 void printGrid(int rows, int cols, char** grid){
@@ -296,7 +318,7 @@ void delay(){
 
 }
 
-void play(int rows, int cols, char** grid, char** bag, char* lettersJ1, char* lettersJ2){
+void play(int rows, int cols, char** grid, int** bag, char* lettersJ1, char* lettersJ2){
     int scoreJ1, scoreJ2, isJ1;
     int continueGame;
 
@@ -306,29 +328,33 @@ void play(int rows, int cols, char** grid, char** bag, char* lettersJ1, char* le
     scoreJ2 = 0;
     while(continueGame){
         if(isJ1){
-            // lettersJ1 = distribuate(/*bag*/, &isJ1, &lettersJ1);
+            // lettersJ1 = distribuate(bag, lettersJ1, int size);
         }else{
-            // lettersJ2 = distribuate(/*bag*/, &isJ1, &lettersJ2);
+            // lettersJ2 = distribuate(bag, letters, int size);
         }
         // printHand()
-        askToPlay(rows, cols, grid, bag, isJ1 ? &scoreJ1 : &scoreJ2, isJ1 ? &lettersJ1 : &lettersJ2);
-        // continueGame = checkEndGame();
+        continueGame = askToPlay(rows, cols, grid, bag, isJ1 ? &scoreJ1 : &scoreJ2, isJ1 ? lettersJ1 : lettersJ2);
+        if(continueGame == 1){
+            // checkEndGame();
+        }else{
+            endgame(rows, cols, grid, bag, lettersJ1, lettersJ2, scoreJ1, scoreJ2);
+        }
         isJ1 = isJ1 ? 0 : 1;
         // printf("J :%d\n", isJ1);
     }
 }
 
-// char** distribuate(char** bag, int isJ1, char** lettersJ2){
+// char** distribuate(char** bag, char** letters, int size){
 
 // }
 
-void askToPlay(int rows, int cols, char** grid, char** bag, int* score, char* letters){
+int askToPlay(int rows, int cols, char** grid, int** bag, int* score, char* letters){
     int menuBool = 1;
 
     do{
         printGrid(rows, cols, grid);
         // printLetters(char* letters);
-        printf( "    Taper :\n"  
+        printf( "    Taper :\n"
                 "       1) Pour passer votre tour\n"
                 // "       2) Pour poser un mot\n"
                 "       3) Pour quitter\n"
@@ -350,21 +376,52 @@ void askToPlay(int rows, int cols, char** grid, char** bag, int* score, char* le
 
         if(menuBool == 2){
             // meilleurCoup();
-            return 1;
+            // incrémentation score ???
+        }else if(menuBool == 3){
+            return 0;
         }
-        // }else if(menuBool == 3){
-        //     endGame();
-        //     return 0;
-        // }
     }while(menuBool != 1);
+    return 1;
 }
 
-void engame(){
+void endgame(int rows, int cols, char** grid, int **bag, char *lettersJ1, char *lettersJ2, int scoreJ1, int scoreJ2){
+    printGrid(rows, cols, grid);
+    printf("        PARTIE TERMINEE !\n"
+           "  -------------------------\n\n"
+           );
+    if(scoreJ1 != scoreJ2){
+        printf( "        Le joueur J%d a gagne \\o/\n"
+                "         J1 : %d Points\n"
+                "         J2 : %d Points\n"
+                , scoreJ1 > scoreJ2 ? 1 : 2, scoreJ1, scoreJ2);
+    }else{
+        printf( "        Score a egalite !\n"
+                "         J1 : %d Points\n"
+                "         J2 : %d Points\n"
+                , scoreJ1, scoreJ2);
+    }
 
+    system("pause");
+
+    freeDoubleArrayC(rows, cols, grid);
+    printf("okc");
+
+    freeDoubleArrayI(2, 27, bag);
+    printf("oki");
+    system("pause");
+    if(lettersJ1){
+        free(lettersJ1);
+    }
+    if(lettersJ2){
+        free(lettersJ2);
+    }
+    // menu();
+    exit(0);
 }
 
 int returnValueOfLetter(char* letter, int** array){
-    for(int i = 0; i < 26; i++){
+    int i;
+    for( i = 0; i < 26; i++){
         if(letter == i+65){
             return array[0][i];
         }
